@@ -16,6 +16,7 @@ def preload():
     safe_remove(files, '.DS_Store')
     for file in files:
         image = io.imread('./data/download/' + file, as_grey=True)
-        edges = np.invert((np.uint8(feature.canny(image, sigma=1) * 256)))
+        canny = feature.canny(image, sigma=1)
+        edges = np.invert((np.uint8(canny * 255)))
         edges = color.gray2rgb(edges)
         io.imsave('./data/line/' + file + '.tiff', edges)
