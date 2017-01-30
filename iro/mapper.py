@@ -1,19 +1,20 @@
-import os, random
+import random
+import os
 from iro.preload import safe_remove
 import numpy as np
 from skimage import io, color, transform, util
 
 
 def mapper():
-    files = os.listdir(os.path.curdir + '/data/download/')
+    files = os.listdir('./data/download/')
     safe_remove(files, '.gitkeep')
     safe_remove(files, '.DS_Store')
     values = []
     for file in files:
         try:
-            image = io.imread(os.path.curdir + '/data/download/' + file)
+            image = io.imread('./data/download/' + file)
             image = transform.resize(image, (256, 256))
-            line = io.imread(os.path.curdir + '/data/line/' + file + '.tiff')
+            line = io.imread('./data/line/' + file + '.tiff')
             line = transform.resize(line, (256, 256))
             if image.shape == (256, 256, 3) and line.shape == (256, 256, 3):
                 values.append((line,
@@ -43,7 +44,7 @@ class Generator:
                 inputs.append(transform.rotate(color.rgb2hsv(util.random_noise(image[0])), angle))
                 outputs.append(transform.rotate(color.rgb2hsv(image[1]), angle))
                 count += 1
-                if count >= 30:
+                if count >= 4:
                     count = 0
                     yield np.array(inputs), np.array(outputs)
                     inputs = []
