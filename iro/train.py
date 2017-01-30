@@ -60,7 +60,7 @@ def train():
                         callbacks=[
                             ModelCheckpoint('./checkpoint/checkpoint.{epoch:02d}.hdf5', verbose=0,
                                             save_best_only=False, save_weights_only=False, mode='auto',
-                                            period=1),
+                                            period=100),
                             ModelCheckpoint('./checkpoint/checkpoint.newest.hdf5', verbose=0,
                                             save_best_only=False, save_weights_only=False, mode='auto',
                                             period=1),
