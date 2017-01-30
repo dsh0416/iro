@@ -14,7 +14,7 @@ if __name__ == '__main__':
     elif args[1] == 'train':
         train()
     elif args[1] == 'predict':
-        predict()
+        predict(args[2], args[3])
     elif args[1] == 'validate':
         validate()
     else:
