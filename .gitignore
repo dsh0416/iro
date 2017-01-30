@@ -87,3 +87,10 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+data/download
+data/line
+result/
+!data/download/.gitkeep
+!data/line/.gitkeep
+!result/.gitkeep
