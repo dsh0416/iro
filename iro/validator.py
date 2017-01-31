@@ -2,14 +2,15 @@ import os
 from keras.models import load_model
 from iro.preload import safe_remove
 import numpy as np
-from skimage import transform, color, io
+from skimage import transform, io
+from iro.utility import rgb2hls, hls2rgb
 
 
 def validate():
     models = os.listdir('./checkpoint')
     safe_remove(models, '.gitkeep')
     safe_remove(models, '.DS_Store')
-    image = transform.resize(color.rgb2hsv(io.imread('./data/line/61127521_p0_master1200.jpg.tiff')), (256, 256))
+    image = rgb2hls(transform.resize(io.imread('./data/line/61127521_p0_master1200.jpg.tiff'), (128, 128)))
     for model_file in models:
         model = load_model("./checkpoint/" + model_file)
         result = model.predict(np.array([image]))
@@ -18,4 +19,4 @@ def validate():
                 x[...] = 1
             elif x < 0:
                 x[...] = 0
-        io.imsave('./validator/' + model_file + '.tiff', np.ubyte(color.hsv2rgb(result[0]) * 255))
+        io.imsave('./validator/' + model_file + '.tiff', np.ubyte(hls2rgb(result[0]) * 255))
