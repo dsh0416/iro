@@ -2,11 +2,11 @@ from keras.models import Sequential, Model
 from keras.layers import Convolution2D, BatchNormalization, MaxPooling2D, Flatten, Dense, Reshape
 from keras.callbacks import ReduceLROnPlateau
 from iro.data import Data
-import numpy as np
 
 
 class GAN:
     def __init__(self):
+        self.data = None
         self.generator_network = Sequential([
             Convolution2D(32, 4, 4,
                           input_shape=(128, 128, 3),
@@ -93,11 +93,6 @@ class GAN:
             loss='mse',
         )
 
-        # Magic error caused by TensorFlow if prediction not called at first,
-        # Fix with magics mentioned on [http://tsuwabuki.hatenablog.com/entry/2016/10/17/150033]
-        x = np.zeros((1, 128, 128, 3))
-        self.generator_network.predict(x)
-
         self.discriminator_network.compile(
             optimizer='Nadam',
             loss='mse',
@@ -107,8 +102,7 @@ class GAN:
             loss='mse',
         )
 
-        self.gan_network.summary()
-
+    def load_data(self):
         self.data = Data()
 
     def load_weights(self,
