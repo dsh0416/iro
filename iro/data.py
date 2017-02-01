@@ -51,13 +51,15 @@ class Data:
                 angle = random.randrange(0, 3) * 90
                 output = random.randrange(0, 2)
                 if output == 1:
+                    # Get a fake image
                     inputs.append(transform.rotate(generator.predict(np.array([image[0]]))[0], angle))
                 else:
+                    # Get a real image
                     inputs.append(rgb2hls(transform.rotate(image[1], angle)))
                 outputs.append([output * 1.0])
                 count += 1
                 if count >= batch_size:
                     count = 0
                     yield np.array(inputs), np.array(outputs)
-                    inputs.clear()
-                    outputs.clear()
+                    inputs = []
+                    outputs = []

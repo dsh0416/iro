@@ -1,5 +1,5 @@
-from keras.models import Sequential, Model
-from keras.layers import Convolution2D, BatchNormalization, MaxPooling2D, Flatten, Dense, Reshape
+from keras.models import Sequential
+from keras.layers import Convolution2D, GaussianNoise, BatchNormalization, MaxPooling2D, Flatten, Dense, Reshape
 from keras.callbacks import ReduceLROnPlateau
 from iro.data import Data
 
@@ -8,79 +8,73 @@ class GAN:
     def __init__(self):
         self.data = None
         self.generator_network = Sequential([
-            Convolution2D(32, 4, 4,
+            Convolution2D(32, 3, 3,
                           input_shape=(128, 128, 3),
                           activation='relu',
                           border_mode='same',
                           subsample=(2, 2)),
-            BatchNormalization(),
-            Convolution2D(32, 3, 3,
+            GaussianNoise(0.1),
+            Convolution2D(32, 2, 2,
                           activation='relu',
                           border_mode='same',
-                          subsample=(1, 1)),
+                          subsample=(3, 3)),
             BatchNormalization(),
-            Convolution2D(64, 4, 4,
-                          activation='relu',
-                          border_mode='same',
-                          subsample=(2, 2)),
-            BatchNormalization(),
-            Convolution2D(64, 3, 3,
-                          activation='relu',
-                          border_mode='same',
-                          subsample=(1, 1)),
-            BatchNormalization(),
-            Convolution2D(128, 4, 4,
+            Convolution2D(64, 2, 2,
                           activation='relu',
                           border_mode='same',
                           subsample=(2, 2)),
-            BatchNormalization(),
-            Convolution2D(128, 3, 3,
+            Convolution2D(64, 2, 2,
                           activation='relu',
                           border_mode='same',
-                          subsample=(1, 1)),
+                          subsample=(3, 3)),
             BatchNormalization(),
-            MaxPooling2D((16, 16)),
+            Convolution2D(128, 2, 2,
+                          activation='relu',
+                          border_mode='same',
+                          subsample=(2, 2)),
+            Convolution2D(128, 2, 2,
+                          activation='relu',
+                          border_mode='same',
+                          subsample=(3, 3)),
+            BatchNormalization(),
+            Flatten(),
             Dense(128 * 128 * 3, activation='sigmoid'),
             Reshape((128, 128, 3)),
         ], name='Generator')
 
         self.discriminator_network = Sequential([
-            Convolution2D(32, 4, 4,
+            Convolution2D(32, 3, 3,
                           input_shape=(128, 128, 3),
                           activation='relu',
                           border_mode='same',
                           subsample=(2, 2)),
-            BatchNormalization(),
-            Convolution2D(32, 3, 3,
+            GaussianNoise(0.1),
+            Convolution2D(32, 2, 2,
                           activation='relu',
                           border_mode='same',
-                          subsample=(1, 1)),
+                          subsample=(3, 3)),
             BatchNormalization(),
-            Convolution2D(64, 4, 4,
-                          activation='relu',
-                          border_mode='same',
-                          subsample=(2, 2)),
-            BatchNormalization(),
-            Convolution2D(64, 3, 3,
-                          activation='relu',
-                          border_mode='same',
-                          subsample=(1, 1)),
-            BatchNormalization(),
-            Convolution2D(128, 4, 4,
+            Convolution2D(64, 2, 2,
                           activation='relu',
                           border_mode='same',
                           subsample=(2, 2)),
-            BatchNormalization(),
-            Convolution2D(128, 3, 3,
+            Convolution2D(64, 2, 2,
                           activation='relu',
                           border_mode='same',
-                          subsample=(1, 1)),
+                          subsample=(3, 3)),
             BatchNormalization(),
-            MaxPooling2D((16, 16)),
-            Flatten(),  # 128 * 128 * 3
+            Convolution2D(128, 2, 2,
+                          activation='relu',
+                          border_mode='same',
+                          subsample=(2, 2)),
+            Convolution2D(128, 2, 2,
+                          activation='relu',
+                          border_mode='same',
+                          subsample=(3, 3)),
+            BatchNormalization(),
+            Flatten(),
             Dense(128 * 128 * 3, activation='relu'),
-            Dense(256, activation='relu'),
-            Dense(1, activation='sigmoid'),
+            Dense(1, activation='sigmoid')
         ], name='Discriminator')
 
         self.gan_network = Sequential([
@@ -94,11 +88,11 @@ class GAN:
         )
 
         self.discriminator_network.compile(
-            optimizer='Nadam',
+            optimizer='Adam',
             loss='mse',
         )
         self.gan_network.compile(
-            optimizer='Nadam',
+            optimizer='Adam',
             loss='mse',
         )
 
@@ -113,31 +107,25 @@ class GAN:
         self.discriminator_network.load_weights(discriminator_weights)
         self.gan_network.load_weights(gan_weights)
 
-    def train(self, batch_size=8, nb_epoch=4, samples=128, nb_worker=1):
+    def train(self, batch_size=8, nb_epoch=10, samples=128, nb_worker=1):
         while True:
             print('Training Discriminator')
             self.discriminator_network.trainable = True
 
             self.discriminator_network.fit_generator(
                 self.data.discriminator_next(self.generator_network, batch_size=batch_size),
-                validation_data=self.data.discriminator_next(self.generator_network, batch_size=batch_size),
                 samples_per_epoch=samples,
-                nb_val_samples=samples,
                 nb_epoch=nb_epoch,
                 nb_worker=nb_worker,
-                callbacks=[ReduceLROnPlateau()],
             )
 
             print('Training Generator')
             self.discriminator_network.trainable = False
             self.gan_network.fit_generator(
                 self.data.gan_next(batch_size=batch_size),
-                validation_data=self.data.gan_next(batch_size=batch_size),
                 samples_per_epoch=samples,
-                nb_val_samples=samples,
                 nb_epoch=nb_epoch,
                 nb_worker=nb_worker,
-                callbacks=[ReduceLROnPlateau()],
             )
 
             self.discriminator_network.save_weights('./checkpoint/discriminator.new.hdf5')
