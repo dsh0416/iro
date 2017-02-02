@@ -1,5 +1,4 @@
 import os
-from keras.models import load_model
 from iro.preload import safe_remove
 import numpy as np
 from skimage import transform, io

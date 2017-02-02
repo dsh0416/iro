@@ -1,5 +1,5 @@
 from keras.models import Sequential, Model
-from keras.layers import Convolution2D, GaussianNoise, BatchNormalization, Flatten, Dense, Reshape
+from keras.layers import Convolution2D, Flatten, Dense
 from keras.layers import Input, MaxPooling2D, UpSampling2D, merge
 from keras.callbacks import EarlyStopping
 from iro.data import Data
