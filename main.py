@@ -13,10 +13,8 @@ if __name__ == '__main__':
         preload()
     elif args[1] == 'train':
         train()
-    elif args[1] == 'predict':
-        predict(args[2], args[3])
     elif args[1] == 'validate':
         validate()
     else:
-        print('start with args: download, preload, train, predict, validate')
+        print('start with args: download, preload, train, validate')
     exit()
