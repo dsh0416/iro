@@ -85,8 +85,8 @@ class GAN:
         self.data = Data()
 
     def load_weights(self,
-                     generator_weights='./checkpoint/discriminator.new.hdf5',
-                     discriminator_weights='./checkpoint/generator.new.hdf5',
+                     generator_weights='./checkpoint/generator.new.hdf5',
+                     discriminator_weights='./checkpoint/discriminator.new.hdf5',
                      gan_weights='./checkpoint/gan.new.hdf5'):
         self.generator_network.load_weights(generator_weights)
         self.discriminator_network.load_weights(discriminator_weights)
@@ -102,7 +102,7 @@ class GAN:
                 samples_per_epoch=samples,
                 nb_epoch=nb_epoch,
                 nb_worker=nb_worker,
-                callbacks=[EarlyStopping(monitor='loss', patience=5, verbose=0, mode='auto')]
+                callbacks=[EarlyStopping(monitor='loss', patience=2, verbose=0, mode='auto')]
             )
 
             print('Training Generator')
@@ -112,7 +112,7 @@ class GAN:
                 samples_per_epoch=samples,
                 nb_epoch=nb_epoch,
                 nb_worker=nb_worker,
-                callbacks=[EarlyStopping(monitor='loss', patience=5, verbose=0, mode='auto')]
+                callbacks=[EarlyStopping(monitor='loss', patience=2, verbose=0, mode='auto')]
             )
 
             self.discriminator_network.save_weights('./checkpoint/discriminator.new.hdf5')
