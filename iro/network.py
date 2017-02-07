@@ -92,28 +92,33 @@ class GAN:
         self.discriminator_network.load_weights(discriminator_weights)
         self.gan_network.load_weights(gan_weights)
 
-    def train(self, batch_size=8, nb_epoch=10, samples=128, nb_worker=1):
+    def train(self, batch_size=8, nb_epoch=1, samples=128, nb_worker=1):
         while True:
             print('Training Discriminator')
             self.discriminator_network.trainable = True
+            self.discriminator_network.compile(
+                optimizer='RMSprop',
+                loss='mse',
+            )
 
             self.discriminator_network.fit_generator(
                 self.data.discriminator_next(self.generator_network, batch_size=batch_size),
                 samples_per_epoch=samples,
                 nb_epoch=nb_epoch,
-                nb_worker=nb_worker,
-                callbacks=[EarlyStopping(monitor='loss', patience=2, verbose=0, mode='auto')]
-            )
+                nb_worker=nb_worker)
 
             print('Training Generator')
             self.discriminator_network.trainable = False
+            self.discriminator_network.compile(
+                optimizer='RMSprop',
+                loss='mse',
+            )
+
             self.gan_network.fit_generator(
                 self.data.gan_next(batch_size=batch_size),
                 samples_per_epoch=samples,
                 nb_epoch=nb_epoch,
-                nb_worker=nb_worker,
-                callbacks=[EarlyStopping(monitor='loss', patience=2, verbose=0, mode='auto')]
-            )
+                nb_worker=nb_worker)
 
             self.discriminator_network.save_weights('./checkpoint/discriminator.new.hdf5')
             self.generator_network.save_weights('./checkpoint/generator.new.hdf5')
