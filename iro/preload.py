@@ -17,6 +17,6 @@ def preload():
     for file in files:
         image = io.imread('./data/download/' + file, as_grey=True)
         canny = feature.canny(image, sigma=1)
-        edges = np.invert((np.uint8(canny * 255)))
+        edges = np.invert(np.uint8(canny * 255))
         edges = color.gray2rgb(edges)
         io.imsave('./data/line/' + file + '.tiff', edges)
