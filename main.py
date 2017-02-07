@@ -2,7 +2,6 @@ import sys
 from iro.download import download
 from iro.preload import preload
 from iro.train import train
-from iro.predictor import predict
 from iro.validator import validate
 
 if __name__ == '__main__':

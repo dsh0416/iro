@@ -38,7 +38,7 @@ class Generator:
         conv8 = Convolution2D(3, 1, 1, activation='sigmoid')(conv7)
         self.network = Model(input=inputs, output=conv8)
         self.network.compile(
-            optimizer='Nadam',
+            optimizer='RMSprop',
             loss='mse',
         )
 
@@ -78,10 +78,10 @@ class Discriminator:
         dense1 = Dense(128 * 128 * 3, activation='relu')(flatten1)
         dense2 = Dense(32 * 32 * 3, activation='relu')(dense1)
         dense3 = Dense(4 * 4 * 3, activation='relu')(dense2)
-        dense4 = Dense(1, activation='sigmoid')(dense3)
+        dense4 = Dense(1)(dense3)
         self.network = Model(input=inputs, output=dense4)
         self.network.compile(
-            optimizer='Nadam',
+            optimizer='RMSprop',
             loss='mse',
         )
 
@@ -98,7 +98,7 @@ class GAN:
         ], name='GAN')
 
         self.gan_network.compile(
-            optimizer='Adam',
+            optimizer='RMSprop',
             loss='mse',
         )
 
