@@ -3,7 +3,7 @@ import os
 from iro.preload import safe_remove
 import numpy as np
 from skimage import io, transform, util
-from iro.utility import rgb2hls
+from iro.utility import rgb2yuv
 
 
 class Data:
@@ -32,7 +32,7 @@ class Data:
         while True:
             for image in self.data:
                 angle = random.randrange(0, 3) * 90
-                inputs.append(rgb2hls(transform.rotate(util.random_noise(image[0]), angle)))
+                inputs.append(rgb2yuv(transform.rotate(util.random_noise(image[0]), angle)))
                 outputs.append([0.0])
                 count += 1
                 if count >= batch_size:
@@ -54,7 +54,7 @@ class Data:
                     inputs.append(transform.rotate(generator.predict(np.array([image[0]]))[0], angle))
                 else:
                     # Get a real image
-                    inputs.append(rgb2hls(transform.rotate(image[1], angle)))
+                    inputs.append(rgb2yuv(transform.rotate(image[1], angle)))
                 outputs.append([output * 1.0])
                 count += 1
                 if count >= batch_size:
